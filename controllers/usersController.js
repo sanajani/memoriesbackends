@@ -1,5 +1,5 @@
 import UserModel from '../models/UserModel.js'
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 const maxAge = 7 * 24 * 60 * 60;
 import { createError } from '../middleware/createError.js';
@@ -8,7 +8,7 @@ import { createError } from '../middleware/createError.js';
 export const registerUser = async (req, res, next) => {
     console.log(req.body);
     const {name, email, password} = req.body
-    if(!name || !email || !password) next(createError(401, 'All the fields are required!'))
+    if(!name || !email || !password) return next(createError(401, 'All the fields are required!'))
     const isUser = await UserModel.findOne({email})
     if(isUser) return next(createError(401, "User Already exist"))
     const hashPassword = await bcrypt.hash(password, 12)
@@ -23,7 +23,7 @@ export const registerUser = async (req, res, next) => {
         await newUser.save()
         return res.status(201).json({message: 'Success', newUser})
     } catch (error) {
-        next(error)
+        return next(error)
     }
 }
 
@@ -44,32 +44,22 @@ export const loginUser = async (req, res, next) => {
         })
         const user = await UserModel.findOne({email}).select('-password')
 
-        res.status(200).json({user ,token})
+        return res.status(200).json({user ,token})
 
     } catch (error) {
-        next(error)
+        return next(error)
     }
 }
 
 export const isUserLogged = async (req,res,next) => {
     try {
         const user = await UserModel.findById(req.id).select('-password')
-        res.status(200).json( user )
+        return res.status(200).json( user )
     } catch (error) {
-        next(error)
+        return next(error)
     }
 }
 
-
-// export const logout = async (req, res, next) => {
-//     res
-//     .clearCookie("tokenName", {
-//       sameSite: "none",
-//       secure: true,
-//     })
-//     .status(200)
-//     .send("User has been logged out.");
-// }
 
 export const logout = async (req,res,next) => {
     res
