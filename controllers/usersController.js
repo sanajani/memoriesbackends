@@ -1,7 +1,6 @@
 import UserModel from '../models/UserModel.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-const maxAge = 7 * 24 * 60 * 60;
 import { createError } from '../middleware/createError.js';
 
 
